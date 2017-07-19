@@ -1,0 +1,43 @@
+- name: Add authorized keys
+  authorized_key: user={{ ansible_ssh_user }} key=https://github.com/johnnykv.keys
+
+- name: Add to sudoers without passwrd
+  template: src=./files/90-heralding-deploy-user.j2 dest=/etc/sudoers.d/90-heralding-deploy-user
+  sudo: yes
+
+#/etc/sudoers.d/
+- name: Setup alternate SSH port
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^Port"
+    line: "Port {{ SSHD_PORT }}"
+  notify: "restart sshd"
+  sudo: yes
+
+- name: Disable password authentication
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+  notify: "restart sshd"
+  sudo: yes
+
+- name: Disallow Challenge Response authentication
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^ChallengeResponseAuthentication"
+    line: "ChallengeResponseAuthentication no"
+  notify: "restart sshd"
+  sudo: yes
+
+- name: Disallow empty passwords
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PermitEmptyPasswords"
+    line: "PermitEmptyPasswords no"
+  notify: "restart sshd"
+  sudo: yes
+
+- name: Update packages to the latest version
+  apt: upgrade=dist update_cache=yes
+  sudo: yes

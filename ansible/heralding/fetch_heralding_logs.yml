@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars_files:
+    - roles/honeypots/vars/main.yml
+
+  tasks:
+  - name: Fetch heralding activity file
+    fetch: src={{ HERALDING_WORK_DIR }}/heralding_activity.log dest=tmp/{{ ansible_host }}_{{ansible_date_time.epoch}}_activity.log flat=yes
+    sudo: yes
+
+  - name: Delete old activity log
+    file: path={{ HERALDING_WORK_DIR }}/heralding_activity.log state=absent
+    sudo: yes
+
+  - name: Restart heralding systemd unit
+    service: name=heralding state=restarted enabled=yes
+    sudo: yes

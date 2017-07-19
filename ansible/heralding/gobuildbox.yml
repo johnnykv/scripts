@@ -1,0 +1,5 @@
+---
+- hosts: gobuildboxes
+  roles:
+     - common
+     - gobuildboxes

@@ -1,0 +1,2 @@
+- include: filebeat.yml
+- include: heralding.yml

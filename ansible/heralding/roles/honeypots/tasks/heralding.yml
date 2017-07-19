@@ -1,0 +1,51 @@
+- name: Install Heralding system level dependencies
+  action: apt pkg={{ item }} state=latest update_cache=yes
+  sudo: yes
+  with_items:
+    - libzmq-dev
+    - python-virtualenv
+    - python-pip
+    - build-essential
+    - python-dev
+    - screen
+    - libffi-dev
+    - git
+    - libssl-dev
+    - python-setuptools
+
+- name: Add heralding user
+  user: name={{HERALDING_USER}} append=yes state=present createhome=yes shell="/usr/sbin/nologin"
+  sudo: yes
+
+- name: Create heralding virtualenv
+  file: path={{HERALDING_VIRTUALENV}} state=directory recurse=yes
+  become: yes
+  become_user: "{{HERALDING_USER}}"
+
+- name: Upgrade setuptools in virtualenv
+  pip: name=setuptools state=latest virtualenv={{HERALDING_VIRTUALENV}}
+  become: yes
+  become_user: "{{HERALDING_USER}}"
+
+- name: Create heralding work dir
+  file: path={{HERALDING_WORK_DIR}} state=directory recurse=yes
+  become: yes
+  become_user: "{{HERALDING_USER}}"
+
+- name: Install or upgrade heralding in virtualenv
+  pip: name=heralding state=latest virtualenv={{HERALDING_VIRTUALENV}}
+  become: yes
+  become_user: "{{HERALDING_USER}}"
+
+- name: Install heralding systemd unit
+  template: src=./files/heralding.service.j2 dest=/etc/systemd/system/heralding.service
+  sudo: yes
+
+- name: Configure heralding
+  template: src=./files/heralding.yml.j2 dest={{ HERALDING_WORK_DIR }}/heralding.yml
+  become: yes
+  become_user: "{{HERALDING_USER}}"
+
+- name: Start and enable heralding systemd unit
+  service: name=heralding state=restarted enabled=yes
+  sudo: yes

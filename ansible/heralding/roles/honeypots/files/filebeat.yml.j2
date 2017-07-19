@@ -1,0 +1,32 @@
+filebeat.prospectors:
+
+- input_type: log
+
+  paths:
+    - {{ HERALDING_WORK_DIR }}/*.log
+
+name: "{{ host_id }}"
+
+#----------------------------- Logstash output --------------------------------
+#output.logstash:
+  # The Logstash hosts
+  #hosts: ["localhost:5044"]
+
+  # Optional SSL. By default is off.
+  # List of root certificates for HTTPS server verifications
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Certificate for SSL client authentication
+  #ssl.certificate: "/etc/pki/client/cert.pem"
+
+  # Client Certificate Key
+  #ssl.key: "/etc/pki/client/cert.key"
+
+logging.level: info
+
+# temporarily, just PoC until logstash output running 
+output.file:
+  path: "/tmp"
+  filename: filebeat
+  rotate_every_kb: 10000
+  #number_of_files: 3

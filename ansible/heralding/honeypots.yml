@@ -1,0 +1,5 @@
+---
+- hosts: test_servers
+  roles:
+     - common
+     - honeypots

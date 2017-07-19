@@ -1,0 +1,5 @@
+GO_PATH: ~/gopath
+
+env:
+       GO_PATH: ~/gopath
+       PATH: $GOPATH/bin:$PATH

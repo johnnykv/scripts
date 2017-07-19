@@ -1,0 +1,38 @@
+- name: Add golang repository
+  apt_repository: repo='ppa:ubuntu-lxc/lxd-stable' state=present
+  sudo: yes
+
+- name: Install golang
+  action: apt pkg={{ item }} state=latest update_cache=yes
+  sudo: yes
+  with_items:
+    - golang
+    - git
+    - pkg-config
+    - libtool
+    - pkg-config
+    - build-essential
+    - autoconf
+    - automake
+    - uuid-dev
+
+- name: Create ZMQ work directory
+  file: path=tmp state=directory
+
+- name: Get ZMQ source
+  get_url: url=https://github.com/zeromq/zeromq4-1/releases/download/v4.1.5/zeromq-4.1.5.tar.gz dest=~/tmp/
+
+- name: Unarchive ZMQ source
+  unarchive: src=~/tmp/zeromq-4.1.5.tar.gz dest=~/tmp/ copy=no
+
+- name: Compile and Install ZMQ
+  command: ./configure && make
+  args:
+    chdir: tmp/zeromq-4.1.5
+  command: make install && ldconfig
+  args:
+    chdir: tmp/zeromq-4.1.5
+  sudo: yes
+
+- name: Creates directory for gopath
+  file: path={{GO_PATH}} state=directory

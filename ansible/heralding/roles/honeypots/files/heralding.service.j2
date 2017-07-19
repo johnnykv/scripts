@@ -1,0 +1,16 @@
+[Unit]
+Description = heralding
+After = network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ HERALDING_WORK_DIR }}
+Environment=VIRTUAL_ENV="{{ HERALDING_VIRTUALENV }}"
+Environment=PATH="$VIRTUAL_ENV/bin:$PATH"
+ExecStart={{ HERALDING_VIRTUALENV }}/bin/heralding
+ExecReload=/bin/kill -s TERM $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy = multi-user.target
